@@ -1,0 +1,18 @@
+HELP.md
+
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+/target/
+env.properties
+application.properties
+user_images
+project_images
+### IntelliJ IDEA ###
+.idea
+*.iws
+*.iml
+*.ipr
+
+### VS Code ###
+.vscode/

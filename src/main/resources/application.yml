@@ -1,0 +1,61 @@
+spring:
+    application:
+        name: showcase
+
+    config:
+        import: optional:file:env.properties
+
+    security:
+        oauth2:
+            client:
+                provider:
+                    azure:
+                        issuer-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID}/v2.0
+                        authorization-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/authorize
+                        token-uri: https://login.microsoftonline.com/${AZURE_TENANT_ID}/oauth2/v2.0/token
+                        user-info-uri: https://graph.microsoft.com/oidc/userinfo
+                registration:
+                    github:
+                        scope: read:user,user:email
+                        client-id: ${CLIENT_ID}
+                        client-secret: ${CLIENT_SECRET}
+                        redirect-uri: http://localhost:5173
+
+                    azure:
+                        provider: azure
+                        client-id: ${AZURE_CLIENT_ID}
+                        client-secret: ${AZURE_CLIENT_SECRET}
+                        scope: openid,profile,email,https://graph.microsoft.com/User.Read
+                        redirect-uri: http://localhost:5173
+
+    datasource:
+        url: ${DB_URL}
+        username: ${DB_USER}
+        password: ${DB_PASSWORD}
+
+    jpa:
+        hibernate:
+            ddl-auto: update
+
+server:
+    servlet:
+        session:
+            cookie:
+                same-site: none
+                secure: true
+
+s3storage:
+    url: ${S3_URL}
+    access_key: ${S3_ACCESS_KEY}
+    secret_key: ${S3_SECRET_KEY}
+    bucket_name: ${S3_BUCKET_NAME}
+
+front:
+    env: .env
+    local: http://localhost:5173
+    global: http://localhost:5173
+
+app:
+    api:
+        swagger:
+            enable: true
