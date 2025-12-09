@@ -19,14 +19,12 @@ spring:
                         scope: read:user,user:email
                         client-id: ${CLIENT_ID}
                         client-secret: ${CLIENT_SECRET}
-                        redirect-uri: http://localhost:5173
 
                     azure:
                         provider: azure
                         client-id: ${AZURE_CLIENT_ID}
                         client-secret: ${AZURE_CLIENT_SECRET}
                         scope: openid,profile,email,https://graph.microsoft.com/User.Read
-                        redirect-uri: http://localhost:5173
 
     datasource:
         url: ${DB_URL}
