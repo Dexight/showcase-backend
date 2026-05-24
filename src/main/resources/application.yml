@@ -49,9 +49,16 @@ s3storage:
     bucket_name: ${S3_BUCKET_NAME}
 
 front:
-    env: .env
-    local: http://localhost:5173
-    global: http://localhost:5173
+    # Установи FRONT_ENV=production в проде, чтобы редиректы шли на FRONT_URL.
+    env: ${FRONT_ENV:.env}
+    local: ${FRONT_LOCAL_URL:http://localhost:5173}
+    # Базовый URL развёрнутого фронта. Используется как:
+    #  - CORS allowed origin,
+    #  - logout redirect,
+    #  - OAuth2 successHandler defaultTargetUrl.
+    # При same-origin деплое (фронт+бэк за одним nginx) — это публичный URL сайта,
+    # например https://showcase.example.com
+    global: ${FRONT_URL:http://localhost:5173}
 
 app:
     api:
