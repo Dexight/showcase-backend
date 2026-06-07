@@ -15,10 +15,12 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.client.oidc.userinfo.OidcUserService;
 import org.springframework.security.oauth2.client.userinfo.DefaultOAuth2UserService;
 import org.springframework.security.provisioning.InMemoryUserDetailsManager;
+import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.SimpleUrlAuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 import org.springframework.web.filter.CorsFilter;
@@ -39,7 +41,11 @@ public class SecurityConfig {
     String env;
 
     @Bean
-    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    SecurityFilterChain securityFilterChain(HttpSecurity http, ObjectProvider<DevTokenAuthFilter> devTokenAuthFilter) throws Exception {
+        DevTokenAuthFilter devFilter = devTokenAuthFilter.getIfAvailable();
+        if (devFilter != null) {
+            http.addFilterBefore(devFilter, UsernamePasswordAuthenticationFilter.class);
+        }
         http
             .csrf(csrf -> csrf.disable())
             .cors(withDefaults())

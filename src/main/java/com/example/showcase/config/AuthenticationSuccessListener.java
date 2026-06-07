@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationListener;
 import org.springframework.security.authentication.event.AuthenticationSuccessEvent;
 import org.springframework.security.oauth2.core.oidc.user.OidcUser;
-import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -24,17 +23,14 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
     @Override
     public void onApplicationEvent(AuthenticationSuccessEvent event) {
         Object principal = event.getAuthentication().getPrincipal();
-        String email = "";
-        String name = "";
-        if (principal instanceof OidcUser) {
-            OidcUser oidcUser = (OidcUser) event.getAuthentication().getPrincipal();
-            email = (String) oidcUser.getAttributes().get("email");
-            name =  (String) oidcUser.getAttributes().get("name");
+        if (!(principal instanceof OidcUser oidcUser)) {
+            return;
         }
-        else if (principal instanceof OAuth2User) {
-            OAuth2User oauth2User = (OAuth2User) event.getAuthentication().getPrincipal();
-            email = (String) oauth2User.getAttributes().get("email");
-            name =  (String) oauth2User.getAttributes().get("login");
+        String email = (String) oidcUser.getAttributes().get("email");
+        String name = (String) oidcUser.getAttributes().get("name");
+
+        if (email == null) {
+            return;
         }
 
         if (!userRepository.existsByEmail(email)) {
@@ -44,8 +40,6 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             Role role = roleService.getRoleById(1);
             user.setRole(role);
             userRepository.save(user);
-        } else {
-            System.out.println("This email " + email + " already has");
         }
     }
 }
