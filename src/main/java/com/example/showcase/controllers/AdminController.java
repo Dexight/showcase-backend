@@ -6,13 +6,11 @@ import com.example.showcase.entity.Project;
 import com.example.showcase.entity.Tag;
 import com.example.showcase.entity.Track;
 import com.example.showcase.primary_filling.PrimaryFillingLoader;
-import com.example.showcase.service.DateService;
-import com.example.showcase.service.ProjectService;
-import com.example.showcase.service.TagService;
-import com.example.showcase.service.TrackService;
+import com.example.showcase.service.*;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -31,7 +29,9 @@ public class AdminController {
     private ProjectService projectService;
     private DateService dateService;
     private PrimaryFillingLoader primaryFillingLoader;
+    private SecurityService securityService;
 
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     @PostMapping("tracks")
     public ResponseEntity<Track> createTrack(@RequestBody Track track) {
         Track savedTrack = trackService.createTrack(track);
@@ -39,72 +39,84 @@ public class AdminController {
     }
 
     @GetMapping("tracks/{id}")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Track> getTrackById(@PathVariable("id") int trackId) {
         Track track = trackService.getTrackById(trackId);
         return ResponseEntity.ok(track);
     }
 
     @GetMapping("tracks")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<List<Track>> getAllTracks() {
         List<Track> tracks = trackService.getAllTracks();
         return ResponseEntity.ok(tracks);
     }
 
     @PostMapping("tags")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Tag> createTag(@RequestBody Tag tag) {
         Tag savedTag = tagService.createTag(tag);
         return new ResponseEntity<>(savedTag, HttpStatus.CREATED);
     }
 
     @GetMapping("tags/{id}")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Tag> getTagById(@PathVariable("id") int tagId) {
         Tag tag = tagService.getTagById(tagId);
         return ResponseEntity.ok(tag);
     }
 
     @GetMapping("tags")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<List<Tag>> getAllTags() {
         List<Tag> tags = tagService.getAllTags();
         return ResponseEntity.ok(tags);
     }
 
     @PostMapping("projects")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Project> createProject(@ModelAttribute ProjectDTO project) {
         Project savedProject = projectService.createProject(project);
         return new ResponseEntity<>(savedProject, HttpStatus.CREATED);
     }
 
     @GetMapping("projects/{id}")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Project> getProjectById(@PathVariable("id") int projectId) {
         Project project = projectService.getProjectById(projectId);
         return ResponseEntity.ok(project);
     }
 
     @GetMapping("projects")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<List<Project>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
         return ResponseEntity.ok(projects);
     }
 
     @PostMapping("dates")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Date> createDate(@RequestBody Date date) {
         Date saveDate = dateService.createDate(date);
         return new ResponseEntity<>(saveDate, HttpStatus.CREATED);
     }
 
     @GetMapping("dates/{id}")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Date> getDate(@PathVariable("id")  int dateId) {
         Date date = dateService.getDateById(dateId);
         return ResponseEntity.ok(date);
     }
 
     @GetMapping("dates")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<List<Date>> getAllDates() {
         List<Date> dates = dateService.getAllDates();
         return ResponseEntity.ok(dates);
     }
 
     @PostMapping("primary_filling")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<String> processPrimaryFilling(
             //TODO RequestParam vs RequestBody
             @RequestParam("date") Date date,
@@ -139,6 +151,7 @@ public class AdminController {
 
 
     @PatchMapping("projects/{id}/title")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectTitle(
             @PathVariable("id") int projectId,
             @RequestParam String title) {
@@ -147,6 +160,7 @@ public class AdminController {
     }
 
     @PatchMapping("projects/{id}/description")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectDescription(
             @PathVariable("id") int projectId,
             @RequestParam String description) {
@@ -155,6 +169,7 @@ public class AdminController {
     }
 
     @PatchMapping("projects/{id}/grade")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectGrade(
             @PathVariable("id") int projectId,
             @RequestParam Integer grade) {
@@ -163,6 +178,7 @@ public class AdminController {
     }
 
     @PatchMapping("projects/{id}/presentation")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectPresentation(
             @PathVariable("id") int projectId,
             @RequestParam String presentation) {
@@ -171,6 +187,7 @@ public class AdminController {
     }
 
     @PatchMapping("projects/{id}/repo")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectRepo(
             @PathVariable("id") int projectId,
             @RequestParam String repo) {
@@ -179,6 +196,7 @@ public class AdminController {
     }
 
     @PatchMapping("projects/{id}/date")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectDate(
             @PathVariable("id") int projectId,
             @RequestParam int dateId) {
@@ -187,6 +205,7 @@ public class AdminController {
     }
 
     @PatchMapping("projects/{id}/track")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> updateProjectTrack(
             @PathVariable("id") int projectId,
             @RequestParam int trackId) {
@@ -195,6 +214,7 @@ public class AdminController {
     }
 
     @PostMapping("projects/{id}/users/add")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> addUserToProject(
             @PathVariable("id") int projectId,
             @RequestParam int userId) {
@@ -203,6 +223,7 @@ public class AdminController {
     }
 
     @DeleteMapping("projects/{id}/users/remove")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> removeUserFromProject(
             @PathVariable("id") int projectId,
             @RequestParam int userId) {
@@ -211,6 +232,7 @@ public class AdminController {
     }
 
     @PostMapping("projects/{id}/tags/add")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> addTagToProject(
             @PathVariable("id") int projectId,
             @RequestParam int tagId) {
@@ -219,6 +241,7 @@ public class AdminController {
     }
 
     @DeleteMapping("projects/{id}/tags/remove")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
     public ResponseEntity<Project> removeTagFromProject(
             @PathVariable("id") int projectId,
             @RequestParam int tagId) {
