@@ -115,7 +115,10 @@ public class PrimaryFillingLoader {
         List<UserDTO> userDTOs;
         userDTOs = new ArrayList<>(
                mapper.mapToUserDTOList(getSummaryTable())
-                        .stream().filter(x->!userService.exitsByFullNameAndCourse(x)).toList());
+                        .stream()
+                        .filter(x -> !userService.existsByEmail(x.getEmail()))
+                        .filter(x -> !userService.exitsByFullNameAndCourse(x))
+                        .toList());
         if(!userDTOs.isEmpty()) userService.saveUsersFromDTO(userDTOs);
         System.out.println("Users Saved!");
 

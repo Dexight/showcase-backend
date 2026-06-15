@@ -27,6 +27,8 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
+    boolean existsByEmail(String email);
+
     //TODO проверка уникальности пользователя (сейчас по ФИО и курсу)
     boolean exitsByFullNameAndCourse(UserDTO userDTO);
 

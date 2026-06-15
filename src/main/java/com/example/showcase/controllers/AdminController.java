@@ -86,6 +86,12 @@ public class AdminController {
         return ResponseEntity.ok(projects);
     }
 
+    @DeleteMapping("projects/{id}")
+    public ResponseEntity<String> deleteProject(@PathVariable("id") int projectId) {
+        projectService.deleteProject(projectId);
+        return ResponseEntity.ok("Project is deleted");
+    }
+
     @PostMapping("dates")
     public ResponseEntity<Date> createDate(@RequestBody Date date) {
         Date saveDate = dateService.createDate(date);
