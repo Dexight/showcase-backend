@@ -18,6 +18,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 @Service
 @AllArgsConstructor
@@ -404,4 +406,106 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(project);
     }
 
+    @Override
+    public void updateScreenshots(
+            int projectId,
+            List<String> existingImages,
+            List<MultipartFile> newImages,
+            MultipartFile mainScreenshotFile,
+            String mainScreenshotUrl
+    ) {
+        try {
+            Project project = projectRepository.findById(projectId)
+                    .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+            List<String> currentScreenshots = project.getScreenshots() != null
+                    ? project.getScreenshots()
+                    : new ArrayList<>();
+
+
+            String regex1 = "^http://localhost:8080/api/projects/([^/]+)/screenshots/([^/]+)$";
+            String regex2 = "^http://localhost:8080/api/projects/([^/]+)/main_screenshot$";
+            Pattern pattern1 = Pattern.compile(regex1);
+            Pattern pattern2 = Pattern.compile(regex2);
+            for (int i = 0; i < existingImages.size(); i++) {
+                String url = existingImages.get(i);
+
+                Matcher matcher1 = pattern1.matcher(url);
+
+                if (matcher1.matches()) {
+                    Integer id = Integer.parseInt(matcher1.group(2));
+
+                    String newUrl = currentScreenshots.get(id);
+                    if (newUrl != null) {
+                        existingImages.set(i, newUrl);
+                    }
+
+                } else {
+                    Matcher matcher2 = pattern2.matcher(url);
+
+                    if (matcher2.matches()) {
+                        Integer id = Integer.parseInt(matcher2.group(1));
+
+                        String newUrl = currentScreenshots.get(id);
+                        if (newUrl != null) {
+                            existingImages.set(i, newUrl);
+                        }
+                    }
+                }
+            }
+
+            List<String> updatedScreenshots = new ArrayList<>();
+
+            // 1. Оставляем только те, что пришли с фронта
+            for (String image : currentScreenshots) {
+                if (existingImages.contains(image)) {
+                    updatedScreenshots.add(image);
+                } else {
+                    // удаляем из хранилища
+                    storageService.deleteFile(image);
+                }
+            }
+
+            // 2. Добавляем новые изображения
+            if (newImages != null) {
+                for (MultipartFile file : newImages) {
+                    if (!file.isEmpty()) {
+                        String fileName = FileNameGenerator.generateFileName(
+                                Prefix.PROJECT_OTHER_SCREENSHOTS,
+                                project.getTitle()
+                        );
+
+                        storageService.uploadFile(fileName, file);
+                        updatedScreenshots.add(fileName);
+                    }
+                }
+            }
+
+            // 3. Обновляем главный скриншот
+            if (mainScreenshotFile != null && !mainScreenshotFile.isEmpty()) {
+
+                String fileName = FileNameGenerator.generateFileName(
+                        Prefix.PROJECT_MAIN_IMAGE,
+                        project.getTitle()
+                );
+
+                storageService.uploadFile(fileName, mainScreenshotFile);
+
+                // удалить старый, если был
+                if (project.getMainScreenshot() != null) {
+                    storageService.deleteFile(project.getMainScreenshot());
+                }
+
+                project.setMainScreenshot(fileName);
+
+            } else if (mainScreenshotUrl != null && !mainScreenshotUrl.isBlank()) {
+                project.setMainScreenshot(mainScreenshotUrl);
+            }
+
+            // 4. Сохраняем
+            project.setScreenshots(updatedScreenshots);
+            projectRepository.save(project);
+        } catch (Exception exception) {
+            //idk
+        }
+    }
 }

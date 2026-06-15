@@ -248,4 +248,24 @@ public class AdminController {
         Project updatedProject = projectService.removeTagFromProject(projectId, tagId);
         return ResponseEntity.ok(updatedProject);
     }
+
+    @PatchMapping("projects/{projectId}/screenshots")
+    @PreAuthorize("@securityService.canEditProject(authentication, #projectId)")
+    public ResponseEntity<Void> updateScreenshots(
+            @PathVariable int projectId,
+            @RequestParam(required = false) List<String> existingImages,
+            @RequestParam(required = false) List<MultipartFile> newImages,
+            @RequestParam(required = false) MultipartFile mainScreenshotFile,
+            @RequestParam(required = false) String mainScreenshotUrl
+    ) {
+        projectService.updateScreenshots(
+                projectId,
+                existingImages != null ? existingImages : List.of(),
+                newImages != null ? newImages : List.of(),
+                mainScreenshotFile,
+                mainScreenshotUrl
+        );
+
+        return ResponseEntity.ok().build();
+    }
 }
