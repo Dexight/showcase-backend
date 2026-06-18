@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.util.List;
+
 @Getter
 @Setter
 @NoArgsConstructor
@@ -19,5 +21,8 @@ public class Date {
 
     @Column(name = "name", nullable = false, unique = true)
     private String name;
+
+    @Column(name = "closed_tracks_id")
+    private List<Integer> closedTracksId;
 
 }

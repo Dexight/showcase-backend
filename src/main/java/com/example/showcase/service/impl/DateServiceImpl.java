@@ -6,6 +6,7 @@ import com.example.showcase.service.DateService;
 import lombok.AllArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -55,5 +56,34 @@ public class DateServiceImpl implements DateService {
 
     @Override
     public Date getDateByName(String dateName){return dateRepository.getDateByName(dateName);}
+
+    @Override
+    public boolean lockTrack(int dateId, int trackId) {
+        Date date = getDateById(dateId);
+        boolean locked = false;
+        if (date.getClosedTracksId() == null) {
+            date.setClosedTracksId(new ArrayList<>());
+        }
+        if (!date.getClosedTracksId().contains(trackId)) {
+            locked = date.getClosedTracksId().add(trackId);
+            dateRepository.save(date);
+        }
+        return locked;
+    }
+
+    @Override
+    public boolean unlockTrack(int dateId, int trackId) {
+        Date date = getDateById(dateId);
+        if (date.getClosedTracksId() == null) {
+            date.setClosedTracksId(new ArrayList<>());
+        }
+        boolean deleted = date.getClosedTracksId().removeIf(id -> id.equals(trackId));
+        if (deleted) {
+            dateRepository.save(date);
+        }
+        return deleted;
+    }
+
+
 
 }

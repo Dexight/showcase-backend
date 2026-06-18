@@ -44,7 +44,7 @@ public class SecurityConfig {
             .csrf(csrf -> csrf.disable())
             .cors(withDefaults())
             .authorizeHttpRequests(auth -> auth
-                    .requestMatchers(HttpMethod.GET, "/", "/projects/**","/users/**", "/dates/**", "/tags/**", "/tracks/**", "/error", "/webjars/**").permitAll()
+                    .requestMatchers(HttpMethod.GET, "/", "/projects/**","/users/**", "/dates/**", "/tags/**", "/tracks/**", "/error", "/webjars/**", "/swagger-ui/**", "/v3/api-docs/**").permitAll()
                     .anyRequest().authenticated())
             .exceptionHandling(e -> e.authenticationEntryPoint(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED)))
             .logout(l -> l
