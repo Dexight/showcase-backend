@@ -32,4 +32,6 @@ public interface UserService {
 
     //TODO проверка уникальности пользователя (сейчас по ФИО и курсу)
     User getUserByFullNameAndCourse(String fullName, String course);
+
+    boolean changeRole (int userId, int roleId);
 }

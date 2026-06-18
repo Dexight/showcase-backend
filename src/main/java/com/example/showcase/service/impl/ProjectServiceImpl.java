@@ -443,9 +443,7 @@ public class ProjectServiceImpl implements ProjectService {
                     Matcher matcher2 = pattern2.matcher(url);
 
                     if (matcher2.matches()) {
-                        Integer id = Integer.parseInt(matcher2.group(1));
-
-                        String newUrl = currentScreenshots.get(id);
+                        String newUrl = project.getMainScreenshot();
                         if (newUrl != null) {
                             existingImages.set(i, newUrl);
                         }

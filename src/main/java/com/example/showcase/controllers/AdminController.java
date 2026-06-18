@@ -24,12 +24,16 @@ import java.util.List;
 @RestController
 @RequestMapping("/admin")
 public class AdminController {
+    private UserService userService;
     private TrackService trackService;
     private TagService tagService;
     private ProjectService projectService;
     private DateService dateService;
     private PrimaryFillingLoader primaryFillingLoader;
     private SecurityService securityService;
+
+    private static final int ADMIN_ROLE_ID = 4;
+    private static final int MEMBER_ROLE_ID = 1;
 
     @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     @PostMapping("tracks")
@@ -266,6 +270,28 @@ public class AdminController {
                 mainScreenshotUrl
         );
 
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/admins")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
+    public ResponseEntity<Void> makeAdmin (
+            @RequestParam int userId
+    ) {
+        if(!userService.changeRole(userId, ADMIN_ROLE_ID)) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok().build();
+    }
+
+    @DeleteMapping("/admins/{userId}")
+    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
+    public ResponseEntity<Void> makeNotAdmin (
+            @RequestParam int userId
+    ) {
+        if(!userService.changeRole(userId, MEMBER_ROLE_ID)) {
+            return ResponseEntity.notFound().build();
+        }
         return ResponseEntity.ok().build();
     }
 }
