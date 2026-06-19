@@ -171,6 +171,11 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public boolean existsByEmail(String email) {
+        return email != null && userRepository.existsByEmail(email);
+    }
+
+    @Override
     public boolean exitsByFullNameAndCourse(UserDTO userDTO) {
         return userRepository.existsUserByFullNameAndCourse(userDTO.getFullName(), userDTO.getCourse());
     }

@@ -85,7 +85,22 @@ public abstract class PrimaryFillingMapper {
     @Mapping(target = "id",constant = "0") //для автоинкремента при добавлении Entity
     @Mapping(target = "fullName", source = "summary", qualifiedByName = "concatName")
     @Mapping(target = "roleId", source = "summary.comment", qualifiedByName = "setRole")
+    @Mapping(target = "email", source = "summary.email", qualifiedByName = "normEmail")
     abstract UserDTO mapToUserDTO(SummaryTableDTO summary);
+
+    @Named("normEmail")
+    protected String normEmail(String email) {
+        return normalizeEmail(email);
+    }
+
+    //Приведение email к единому виду для сопоставления с email из OAuth-токена
+    public static String normalizeEmail(String email) {
+        if (email == null) {
+            return null;
+        }
+        String normalized = email.trim().toLowerCase();
+        return normalized.isEmpty() ? null : normalized;
+    }
 
     abstract List<UserDTO> mapToUserDTOList(List<SummaryTableDTO> summaryTableDTOList);
 
