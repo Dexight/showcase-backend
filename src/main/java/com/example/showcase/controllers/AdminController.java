@@ -287,7 +287,7 @@ public class AdminController {
     @DeleteMapping("/admins/{userId}")
     @PreAuthorize("@securityService.hasAdminAccess(authentication)")
     public ResponseEntity<Void> makeNotAdmin (
-            @RequestParam int userId
+            @PathVariable int userId
     ) {
         if(!userService.changeRole(userId, MEMBER_ROLE_ID)) {
             return ResponseEntity.notFound().build();

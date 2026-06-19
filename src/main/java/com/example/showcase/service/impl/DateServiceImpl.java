@@ -4,6 +4,7 @@ import com.example.showcase.entity.Date;
 import com.example.showcase.repository.DateRepository;
 import com.example.showcase.service.DateService;
 import lombok.AllArgsConstructor;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -28,7 +29,7 @@ public class DateServiceImpl implements DateService {
 
     @Override
     public List<Date> getAllDates() {
-        return dateRepository.findAll();
+        return dateRepository.findAll((Sort.by(Sort.Direction.ASC, "id")));
     }
 
     @Override
