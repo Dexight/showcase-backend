@@ -17,7 +17,6 @@ import java.util.regex.Pattern;
 
 @Mapper(unmappedTargetPolicy = ReportingPolicy.IGNORE, componentModel = "spring")
 public abstract class PrimaryFillingMapper {
-    //static NewPrimaryFillingMapper mapper = Mappers.getMapper(NewPrimaryFillingMapper.class);
 
     @Autowired
     private TrackService trackService;
@@ -68,16 +67,22 @@ public abstract class PrimaryFillingMapper {
         String[] team = Pattern.compile("\n").split(teamStr);
         for (String participant: team){
             String[] participantInfo = Pattern.compile("\\s+").split(participant);
-            if (participantInfo.length == 3){ //может отсутствовать отчество
-                result.add(userService.getUserByFullNameAndCourse(
-                        getFullName(participantInfo[0], participantInfo[1], ""),
-                        participantInfo[2]).getId());
+            String fullName;
+            String course;
+            if (participantInfo.length == 3){
+                fullName = getFullName(participantInfo[0], participantInfo[1], "");
+                course = participantInfo[2];
+            } else {
+                fullName = getFullName(participantInfo[0], participantInfo[1], participantInfo[2]);
+                course = participantInfo[3];
             }
-            else {
-                result.add(userService.getUserByFullNameAndCourse(
-                        getFullName(participantInfo[0], participantInfo[1], participantInfo[2]),
-                        participantInfo[3]).getId());
+            course = course.toLowerCase();
+            var user = userService.getUserByFullNameAndCourse(fullName, course);
+            if (user == null) {
+                throw new IllegalStateException(
+                        "Участник не найден в БД при загрузке данных: \"" + fullName + "\", курс: \"" + course + "\"");
             }
+            result.add(user.getId());
         }
         return result;
     }

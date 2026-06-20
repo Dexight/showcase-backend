@@ -135,7 +135,7 @@ public class UserServiceImpl implements UserService {
             user.setId(userDTO.getId());
             user.setEmail(userDTO.getEmail());
             user.setGroup(userDTO.getGroup());
-            user.setCourse(userDTO.getCourse());
+            user.setCourse(userDTO.getCourse() != null ? userDTO.getCourse().toLowerCase() : null);
 
             if (userDTO.getImage() != null && !userDTO.getImage().isEmpty()) {
                 String imagePath = saveImage(userDTO.getImage(), user.getFullName());
