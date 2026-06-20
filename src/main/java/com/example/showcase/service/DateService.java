@@ -21,4 +21,8 @@ public interface DateService {
     boolean existsByName(String dateName);
 
     Date getDateByName(String dateName);
+
+    boolean lockTrack(int dateId, int trackId);
+
+    boolean unlockTrack(int dateId, int trackId);
 }
