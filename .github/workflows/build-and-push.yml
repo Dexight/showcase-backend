@@ -1,8 +1,9 @@
-name: build-and-push
+name: build-and-push-release
 
 on:
   push:
-    branches: [portainer-deploy]
+    tags:
+      - 'v*.*.*'            
   workflow_dispatch:
 
 permissions:
@@ -11,13 +12,25 @@ permissions:
 
 env:
   REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository }}   # dexight/showcase-backend
+  IMAGE_NAME: ${{ github.repository }}
 
 jobs:
   build-and-push:
-    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
+
+      # (Опционально) Проверка, что тег принадлежит ветке main
+      - name: Verify tag is on main
+        if: github.event_name == 'push'   # только для автоматических запусков по тегу
+        run: |
+          git fetch origin main
+          if ! git merge-base --is-ancestor ${{ github.sha }} origin/main; then
+            echo "❌ Тег ${{ github.ref_name }} не принадлежит ветке main"
+            exit 1
+          fi
+          echo "✅ Тег лежит в main"
 
       - uses: docker/setup-buildx-action@v3
 
@@ -34,9 +47,12 @@ jobs:
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
           tags: |
-            type=raw,value=latest,enable=${{ github.ref == 'refs/heads/portainer-deploy' }}
-            type=ref,event=branch
-            type=sha,format=short
+            # Теги на основе семантической версии (требует тег формата v1.2.3)
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            # Дополнительный latest только для релизных тегов
+            type=raw,value=latest,enable=${{ github.ref_type == 'tag' }}
 
       - name: Build and push
         uses: docker/build-push-action@v6
