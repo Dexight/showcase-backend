@@ -177,6 +177,7 @@ public class PrimaryFillingLoader {
 
     //Проверка того, что запись в таблице "Аннотации" актуальна (есть участники в таблице "Общие списки")
     private boolean isProjectValid(AnnotationTableDTO annotation) throws FileNotFoundException {
+        if (annotation.getName() == null || annotation.getName().isBlank()) return false;
         return !getSummaryTable().stream().filter(x->x.getTeam().equals(annotation.getName())).toList().isEmpty();
     }
 
