@@ -36,4 +36,6 @@ public interface UserService {
     User getUserByFullNameAndCourse(String fullName, String course);
 
     boolean changeRole (int userId, int roleId);
+
+    void enrichUsersFromDTO(List<UserDTO> userDTOs);
 }
