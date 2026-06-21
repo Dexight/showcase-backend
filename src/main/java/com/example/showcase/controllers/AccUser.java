@@ -4,9 +4,7 @@ import java.security.Principal;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.showcase.entity.User;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClient;
 import org.springframework.security.oauth2.client.OAuth2AuthorizedClientService;
 import org.springframework.security.oauth2.client.authentication.OAuth2AuthenticationToken;
@@ -23,30 +21,17 @@ public class AccUser {
     private OAuth2AuthorizedClientService clientService;
 
     @GetMapping("/user")
-    public Map<String, Object> getUserInfo(Authentication authentication) {
+    public Map<String, Object> getUserInfo(OAuth2AuthenticationToken authentication) {
+        OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(
+                authentication.getAuthorizedClientRegistrationId(),
+                authentication.getName()
+        );
+
+        String accessToken = client.getAccessToken().getTokenValue();
+
         Map<String, Object> userInfo = new HashMap<>();
-
-        if (authentication instanceof OAuth2AuthenticationToken oauth) {
-            OAuth2AuthorizedClient client = clientService.loadAuthorizedClient(
-                    oauth.getAuthorizedClientRegistrationId(),
-                    oauth.getName()
-            );
-            userInfo.put("accessToken", client.getAccessToken().getTokenValue());
-            userInfo.put("attributes", oauth.getPrincipal().getAttributes());
-            return userInfo;
-        }
-
-        if (authentication != null && authentication.getPrincipal() instanceof User user) {
-            Map<String, Object> attrs = new HashMap<>();
-            attrs.put("name", user.getFullName() != null ? user.getFullName() : "dev");
-            attrs.put("email", user.getEmail());
-            attrs.put("picture", user.getImagePath());
-            attrs.put("sub", String.valueOf(user.getId()));
-            userInfo.put("accessToken", "");
-            userInfo.put("attributes", attrs);
-            return userInfo;
-        }
-
+        userInfo.put("accessToken", accessToken);
+        userInfo.put("attributes", authentication.getPrincipal().getAttributes());
         return userInfo;
     }
 

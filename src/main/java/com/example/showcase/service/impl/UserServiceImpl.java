@@ -185,4 +185,17 @@ public class UserServiceImpl implements UserService {
         return userRepository.getUserByFullNameAndCourse(fullName, course);
     }
 
+    @Override
+    public boolean changeRole (int userId, int roleId) {
+        Optional<User> optionalUser = userRepository.findById(userId);
+        Optional<Role> optionalRole = roleRepository.findById(roleId);
+        if (optionalUser.isEmpty() || optionalRole.isEmpty()) {
+            return false;
+        }
+        User user = optionalUser.get();
+        user.setRole(optionalRole.get());
+        userRepository.save(user);
+        return true;
+    }
+
 }

@@ -16,6 +16,9 @@
   <body>
       <h1>Login</h1>
       <div class="container unauthenticated">
+          With GitHub: <a href="/oauth2/authorization/github">click here</a>
+      </div>
+      <div class="container unauthenticated">
           With Azure: <a href="/oauth2/authorization/azure">click here</a>
       </div>
       <div class="container authenticated" style="display: none">

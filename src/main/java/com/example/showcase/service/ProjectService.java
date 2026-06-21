@@ -3,6 +3,7 @@ package com.example.showcase.service;
 import com.example.showcase.dto.ProjectDTO;
 import com.example.showcase.entity.Project;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -62,4 +63,12 @@ public interface ProjectService {
     Project addTagToProject(int projectId, int tagId);
 
     Project removeTagFromProject(int projectId, int tagId);
+
+    public void updateScreenshots(
+            int projectId,
+            List<String> existingImages,
+            List<MultipartFile> newImages,
+            MultipartFile mainScreenshotFile,
+            String mainScreenshotUrl
+    );
 }

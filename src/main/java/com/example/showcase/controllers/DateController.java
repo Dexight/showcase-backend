@@ -45,4 +45,28 @@ public class DateController {
         dateService.deleteDate(dateId);
         return ResponseEntity.ok("Date is deleted");
     }
+
+    @PatchMapping("/{date_id}/lock_track/{track_id}")
+    public ResponseEntity<Void> lockTrack (
+            @PathVariable("date_id") int dateId,
+            @PathVariable("track_id") int trackId
+    ) {
+        if(dateService.lockTrack(dateId, trackId)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+    @PatchMapping("/{date_id}/unlock_track/{track_id}")
+    public ResponseEntity<Void> unlockTrack (
+            @PathVariable("date_id") int dateId,
+            @PathVariable("track_id") int trackId
+    ) {
+        if(dateService.unlockTrack(dateId, trackId)) {
+            return ResponseEntity.ok().build();
+        }
+        return ResponseEntity.badRequest().build();
+    }
+
+
 }
