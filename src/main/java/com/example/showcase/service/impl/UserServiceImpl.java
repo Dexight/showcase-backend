@@ -186,6 +186,24 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public void enrichUsersFromDTO(List<UserDTO> userDTOs) {
+        for (UserDTO dto : userDTOs) {
+            User user = userRepository.findByEmail(dto.getEmail());
+            if (user == null) continue;
+            if (user.getCourse() == null && dto.getCourse() != null) {
+                user.setCourse(dto.getCourse().toLowerCase());
+            }
+            if (user.getGroup() == null && dto.getGroup() != null) {
+                user.setGroup(dto.getGroup());
+            }
+            if (user.getLogin() == null && dto.getLogin() != null) {
+                user.setLogin(dto.getLogin());
+            }
+            userRepository.save(user);
+        }
+    }
+
+    @Override
     public boolean changeRole (int userId, int roleId) {
         Optional<User> optionalUser = userRepository.findById(userId);
         Optional<Role> optionalRole = roleRepository.findById(roleId);

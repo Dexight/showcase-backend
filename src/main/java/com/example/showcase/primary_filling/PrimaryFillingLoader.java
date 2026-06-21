@@ -112,13 +112,19 @@ public class PrimaryFillingLoader {
         System.out.println("Tags Saved!");
 
         //добавление юзеров
-        List<UserDTO> userDTOs;
-        userDTOs = new ArrayList<>(
-               mapper.mapToUserDTOList(getSummaryTable())
-                        .stream()
-                        .filter(x -> !userService.existsByEmail(x.getEmail()))
-                        .filter(x -> !userService.exitsByFullNameAndCourse(x))
-                        .toList());
+        List<UserDTO> allUserDTOs = mapper.mapToUserDTOList(getSummaryTable());
+
+        // Обогащение существующих пользователей (найденных по email) полями course/group/login
+        List<UserDTO> toEnrich = allUserDTOs.stream()
+                .filter(x -> x.getEmail() != null && userService.existsByEmail(x.getEmail()))
+                .toList();
+        if (!toEnrich.isEmpty()) userService.enrichUsersFromDTO(toEnrich);
+
+        // Создание пользователей, которых ещё нет ни по email, ни по ФИО+курс
+        List<UserDTO> userDTOs = new ArrayList<>(allUserDTOs.stream()
+                .filter(x -> !userService.existsByEmail(x.getEmail()))
+                .filter(x -> !userService.exitsByFullNameAndCourse(x))
+                .toList());
         if(!userDTOs.isEmpty()) userService.saveUsersFromDTO(userDTOs);
         System.out.println("Users Saved!");
 
