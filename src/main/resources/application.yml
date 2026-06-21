@@ -39,8 +39,11 @@ server:
     servlet:
         session:
             cookie:
-                same-site: none
-                secure: true
+                # same-origin nginx деплой → lax; кросс-домен (фронт на другом
+                # origin) → none (тогда обязательно secure=true). Локальный
+                # запуск по HTTP → secure=false. Управляется через .env.
+                same-site: ${COOKIE_SAME_SITE:lax}
+                secure: ${COOKIE_SECURE:false}
 
 s3storage:
     url: ${S3_URL}
