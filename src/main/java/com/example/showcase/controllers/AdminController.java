@@ -32,7 +32,7 @@ public class AdminController {
     private PrimaryFillingLoader primaryFillingLoader;
     private SecurityService securityService;
 
-    private static final int ADMIN_ROLE_ID = 4;
+    private static final int ADMIN_ROLE_ID = 2;
     private static final int MEMBER_ROLE_ID = 1;
 
     @PreAuthorize("@securityService.hasAdminAccess(authentication)")
@@ -280,7 +280,7 @@ public class AdminController {
     }
 
     @PostMapping("/admins")
-    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
+    @PreAuthorize("@securityService.hasSuperAdminAccess(authentication)")
     public ResponseEntity<Void> makeAdmin (
             @RequestParam int userId
     ) {
@@ -291,7 +291,7 @@ public class AdminController {
     }
 
     @DeleteMapping("/admins/{userId}")
-    @PreAuthorize("@securityService.hasAdminAccess(authentication)")
+    @PreAuthorize("@securityService.hasSuperAdminAccess(authentication)")
     public ResponseEntity<Void> makeNotAdmin (
             @PathVariable int userId
     ) {

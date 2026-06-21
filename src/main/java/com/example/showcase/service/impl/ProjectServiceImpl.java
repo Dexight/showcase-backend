@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.Console;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
@@ -406,6 +407,8 @@ public class ProjectServiceImpl implements ProjectService {
         return projectRepository.save(project);
     }
 
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    //todo все это нужно исправить, оно не работает
     @Override
     public void updateScreenshots(
             int projectId,
@@ -503,7 +506,8 @@ public class ProjectServiceImpl implements ProjectService {
             project.setScreenshots(updatedScreenshots);
             projectRepository.save(project);
         } catch (Exception exception) {
-            //idk
+            System.out.println(exception.getMessage());
         }
     }
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 }

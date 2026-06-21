@@ -34,9 +34,21 @@ public class SecurityService {
         return isAdmin(user);
     }
 
+    public boolean hasSuperAdminAccess (Authentication authentication) {
+        OAuth2User principal = (OAuth2User) authentication.getPrincipal();
+        String email = principal.getAttribute("email").toString();
+        User user = userService.findByEmail(email);
+        return isSuperAdmin(user);
+    }
+
 
     private boolean isAdmin(User user) {
         int roleId = user.getRole().getId();
         return (roleId == 2) || (roleId == 4);
+    }
+
+    private boolean isSuperAdmin(User user) {
+        int roleId = user.getRole().getId();
+        return (roleId == 4);
     }
 }

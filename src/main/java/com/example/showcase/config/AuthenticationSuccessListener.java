@@ -3,6 +3,7 @@ package com.example.showcase.config;
 import com.example.showcase.entity.Role;
 import com.example.showcase.entity.User;
 import com.example.showcase.primary_filling.PrimaryFillingMapper;
+import com.example.showcase.repository.SuperAdminRepository;
 import com.example.showcase.repository.UserRepository;
 import com.example.showcase.service.RoleService;
 import lombok.RequiredArgsConstructor;
@@ -21,6 +22,7 @@ import java.util.List;
 public class AuthenticationSuccessListener implements ApplicationListener<AuthenticationSuccessEvent> {
 
     private final UserRepository userRepository;
+    private final SuperAdminRepository superAdminRepository;
 
     @Autowired
     private RoleService roleService;
@@ -37,9 +39,15 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         if (email == null) {
             return;
         }
+        boolean isSuperAdmin = superAdminRepository.existsByEmail(email);
 
         // 1) Уже есть запись с таким email — связывание не требуется
         if (userRepository.existsByEmail(email)) {
+            if (isSuperAdmin) {
+                User user = userRepository.findByEmail(email);
+                user.setRole(roleService.getRoleById(4));
+                userRepository.save(user);
+            }
             return;
         }
 
@@ -51,6 +59,9 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
             if (candidates.size() == 1) {
                 User existing = candidates.getFirst();
                 existing.setEmail(email);
+                if (isSuperAdmin) {
+                    existing.setRole(roleService.getRoleById(4));
+                }
                 userRepository.save(existing);
                 return;
             }
@@ -64,8 +75,14 @@ public class AuthenticationSuccessListener implements ApplicationListener<Authen
         User user = new User();
         user.setEmail(email);
         user.setFullName(name);
-        Role role = roleService.getRoleById(1);
-        user.setRole(role);
+        if (isSuperAdmin) {
+            Role role = roleService.getRoleById(4);
+            user.setRole(role);
+        }
+        else {
+            Role role = roleService.getRoleById(1);
+            user.setRole(role);
+        }
         userRepository.save(user);
     }
 
