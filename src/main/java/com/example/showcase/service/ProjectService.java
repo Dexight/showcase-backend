@@ -1,6 +1,7 @@
 package com.example.showcase.service;
 
 import com.example.showcase.dto.ProjectDTO;
+import com.example.showcase.entity.Date;
 import com.example.showcase.entity.Project;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -71,4 +72,6 @@ public interface ProjectService {
             MultipartFile mainScreenshotFile,
             String mainScreenshotUrl
     );
+
+    boolean isTrackLocked(Date date, int trackId);
 }

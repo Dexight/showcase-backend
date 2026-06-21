@@ -22,6 +22,9 @@ public class SecurityService {
             return true;
         }
         Project project = projectService.getProjectById(projectId);
+        if (projectService.isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return false;
+        }
         return project.getUsers()
                     .stream()
                     .anyMatch(u -> u.getId() == user.getId());
