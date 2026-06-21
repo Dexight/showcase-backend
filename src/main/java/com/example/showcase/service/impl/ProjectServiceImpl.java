@@ -315,6 +315,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectTitle(int projectId, String title) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         project.setTitle(title);
         return projectRepository.save(project);
     }
@@ -322,6 +325,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectDescription(int projectId, String description) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         project.setDescription(description);
         return projectRepository.save(project);
     }
@@ -329,6 +335,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectGrade(int projectId, Integer grade) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         project.setGrade(grade);
         return projectRepository.save(project);
     }
@@ -336,6 +345,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectPresentation(int projectId, String presentation) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         project.setPresentation(presentation);
         return projectRepository.save(project);
     }
@@ -343,6 +355,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectRepo(int projectId, String repo) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         project.setRepo(repo);
         return projectRepository.save(project);
     }
@@ -350,6 +365,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectDate(int projectId, int dateId) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         Date date = dateService.getDateById(dateId);
         project.setDate(date);
         return projectRepository.save(project);
@@ -358,6 +376,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project updateProjectTrack(int projectId, int trackId) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         Track track = trackService.getTrackById(trackId);
         project.setTrack(track);
         return projectRepository.save(project);
@@ -366,6 +387,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project addUserToProject(int projectId, int userId) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         User user = userService.getUserById(userId);
         project.getUsers().add(user);
         return projectRepository.save(project);
@@ -374,6 +398,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project removeUserFromProject(int projectId, int userId) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         User user = userService.getUserById(userId);
         project.getUsers().remove(user);
         return projectRepository.save(project);
@@ -382,6 +409,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project addTagToProject(int projectId, int tagId) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         Tag tag = tagService.getTagById(tagId);
 
         if (project.getTags() == null) {
@@ -398,6 +428,9 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public Project removeTagFromProject(int projectId, int tagId) {
         Project project = getProjectById(projectId);
+        if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+            return null;
+        }
         Tag tag = tagService.getTagById(tagId);
 
         if (project.getTags() != null) {
@@ -420,6 +453,10 @@ public class ProjectServiceImpl implements ProjectService {
         try {
             Project project = projectRepository.findById(projectId)
                     .orElseThrow(() -> new ResourceNotFoundException("Project not found"));
+            if (isTrackLocked(project.getDate(), project.getTrack().getId())) {
+
+                return;
+            }
             List<String> currentScreenshots = project.getScreenshots() != null
                     ? project.getScreenshots()
                     : new ArrayList<>();
@@ -510,4 +547,12 @@ public class ProjectServiceImpl implements ProjectService {
         }
     }
     ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+    private boolean isTrackLocked(Date date, int trackId) {
+        List<Integer> closedIds = date.getClosedTracksId();
+        if (closedIds == null) {
+            return false;
+        }
+        return closedIds.contains(trackId);
+    }
 }
